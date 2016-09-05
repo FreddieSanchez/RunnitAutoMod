@@ -3,13 +3,17 @@
 This script is used to helpout AutoMod on some things it can't do.
 
 """
+
 import datetime
-import os
+import os,sys
 import praw
 import logging
 import re
 import sched, time
-from authentication import USERNAME, PASSWORD, AUTHOR
+
+USERNAME=os.environ['USER']
+PASSWORD=os.environ['PASSWORD']
+AUTHOR=os.environ['AUTHOR']
 
 def login():
   r = praw.Reddit('RunnitAutoMod test by ' + AUTHOR);
@@ -28,15 +32,9 @@ def comments_by_user(reddit_session, subreddit, user_name):
     user_comments = [comment for comment in all_comments if comment.author == user]
     return user_comments;
 
-
-if __name__ == '__main__':
-   logging.basicConfig(filename='RunnitMod.'+ str(datetime.date.today())+'.log',level=logging.DEBUG)
-   logging.info(str(datetime.datetime.now()) + ":Starting")
-   #login 
-   r = login()
-
+def run(reddit_session):
    #find all comments by AutoModerator
-   comments = comments_by_user(r, 'Running', 'AutoModerator')
+   comments = comments_by_user(reddit_session, 'Running', 'AutoModerator')
    logging.info(str(datetime.datetime.now()) + ':Found ' + str(len(comments)) + ' for AutoModerator');
 
    #get all comments with negative score
@@ -53,7 +51,22 @@ if __name__ == '__main__':
        title = 'Removed AutoMod comments due to negative score';
        body = 'Removed the following comments. \n';
        body += '\n'.join([comment.permalink for comment in negative_score_comments]);
-       r.send_message('/r/running', title, body)
+       reddit_session.send_message('/r/running', title, body)
 
-   logging.info(str(datetime.datetime.now()) + ":Ending")
- 
+if __name__ == '__main__':
+
+   #login 
+   r = login();
+
+   #Search every 5 minutes.
+   while True:
+       logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+       logging.info(str(datetime.datetime.now()) + ":Starting")
+       
+       #run the bot! check for negative automod comments in /r/running
+       run(r);
+
+       logging.info(str(datetime.datetime.now()) + ":Ending") 
+
+       #done for now, check again in 5 minutes.
+       time.sleep(300);
