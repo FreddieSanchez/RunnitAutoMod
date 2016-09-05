@@ -1,0 +1,1 @@
+heroku run --app runnitautomod -- python runnit-bot.py
