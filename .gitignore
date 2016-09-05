@@ -1,0 +1,4 @@
+*.pyc
+authentication.py
+*.log
+env/
