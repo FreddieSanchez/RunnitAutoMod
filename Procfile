@@ -1,1 +1,1 @@
-web: python runnit-bot.py
+application: python runnit-bot.py
