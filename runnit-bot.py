@@ -28,8 +28,7 @@ def message_me(reddit_session ):
 
 def comments_by_user(reddit_session, subreddit, user_name):
     all_comments = reddit_session.get_comments(subreddit, limit="none")
-    user = praw.objects.Redditor(reddit_session,user_name=user_name) 
-    user_comments = [comment for comment in all_comments if comment.author == user]
+    user_comments = [comment for comment in all_comments if comment.author.name == user_name]
     return user_comments;
 
 def run(reddit_session):
