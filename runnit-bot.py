@@ -14,7 +14,7 @@ import sched, time
 USERNAME=os.environ['USER']
 PASSWORD=os.environ['PASSWORD']
 AUTHOR=os.environ['AUTHOR']
-
+CommentsRemoved = set();
 def login():
   r = praw.Reddit('RunnitAutoMod test by ' + AUTHOR);
   r.login(USERNAME, PASSWORD, disable_warning=True)
@@ -40,18 +40,21 @@ def run(reddit_session):
    #get all comments with negative score
    negative_score_comments = [ c for c in comments if c.score < 0 ]
    logging.info(str(datetime.datetime.now()) + ':Found ' + str(len(negative_score_comments)) + ' negative for AutoModerator');
+   
 
    #remove the comments
    for comment in negative_score_comments:
      logging.debug(comment);
-     comment.remove();
+     if comment not in CommentsRemoved:
+       comment.remove();
+       CommentsRemoved.add(comment);
 
-   # message the real moderators
+   # message the author
    if len(negative_score_comments) > 0:
        title = 'Removed AutoMod comments due to negative score';
        body = 'Removed the following comments. \n';
        body += '\n'.join([comment.permalink for comment in negative_score_comments]);
-       reddit_session.send_message('/r/running', title, body)
+       reddit_session.send_message(AUTHOR, title, body)
 
 if __name__ == '__main__':
 
