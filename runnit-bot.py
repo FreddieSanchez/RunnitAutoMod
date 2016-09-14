@@ -42,20 +42,11 @@ def run(reddit_session):
    
 
    #remove the comments
-   recent_comments_removed = set();
    for comment in negative_score_comments:
      logging.debug(comment);
      if comment not in CommentsRemoved:
        comment.remove();
        CommentsRemoved.add(comment);
-       recent_comments_removed.add(comment);
-
-   # message the author
-   if len(recent_comments_removed) > 0:
-       title = 'Removed AutoMod comments due to negative score';
-       body = 'Removed the following comments. \n';
-       body += '\n'.join([comment.permalink for comment in recent_comments_removed]);
-       reddit_session.send_message(AUTHOR, title, body)
 
 if __name__ == '__main__':
 
